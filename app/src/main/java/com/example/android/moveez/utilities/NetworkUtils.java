@@ -18,7 +18,7 @@ import java.net.URL;
 import java.util.Scanner;
 
 /**
- * Utilities for communicating with themoviedb.org.
+ * Utilities for communicating with themoviedb.org
  */
 
 public class NetworkUtils {
