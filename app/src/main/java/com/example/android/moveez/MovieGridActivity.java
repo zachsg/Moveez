@@ -1,11 +1,12 @@
 package com.example.android.moveez;
 
-import android.os.AsyncTask;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.AsyncTaskLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -20,27 +21,27 @@ import com.example.android.moveez.utilities.NetworkUtils;
 import java.net.URL;
 import java.util.List;
 
-public class MovieGridActivity extends AppCompatActivity {
+public class MovieGridActivity extends AppCompatActivity
+        implements LoaderManager.LoaderCallbacks<List<Movie>> {
 
     private static final String LOG_TAG = MovieGridActivity.class.getSimpleName();
 
-    // Movie grid display RecyclerView and adapter
-    private RecyclerView mMovieGridRV;
-    private MovieAdapter mAdapter;
+    private static final int LOADER_ID = 1;
 
+    private static final String SORT_METHOD_KEY = "sort_key";
     // How many columns the movie grid should have
     private final static int SPAN_COUNT = 2;
-
-    // For showing error messages/states
-    private TextView mErrorTv;
-
-    // For showing when background operations are occurring, waiting for results
-    private ProgressBar mLoadingPB;
-
     // For sorting the movies in the grid
     private static final String POPULAR_MOVIES = "popular";
     private static final String TOP_RATED_MOVIES = "top_rated";
     private static final String LATEST_MOVIES = "now_playing";
+    // Movie grid display RecyclerView and adapter
+    private RecyclerView mMovieGridRV;
+    private MovieAdapter mAdapter;
+    // For showing error messages/states
+    private TextView mErrorTv;
+    // For showing when background operations are occurring, waiting for results
+    private ProgressBar mLoadingPB;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,12 +59,20 @@ public class MovieGridActivity extends AppCompatActivity {
         mErrorTv = (TextView) findViewById(R.id.tv_error);
         mLoadingPB = (ProgressBar) findViewById(R.id.pb_loading);
 
-        loadMovies(null);
+        loadMovies(null, savedInstanceState);
     }
 
-    private void loadMovies(String sort) {
-        if (sort == null) new MovieTask().execute();
-        else new MovieTask().execute(sort);
+    private void loadMovies(String sort, Bundle savedInstanceState) {
+        LoaderManager loaderManager = getSupportLoaderManager();
+        loaderManager.getLoader(LOADER_ID);
+        if (loaderManager == null) {
+            loaderManager.initLoader(LOADER_ID, null, this);
+        } else {
+            Bundle bundle = new Bundle();
+            if (savedInstanceState != null) sort = savedInstanceState.getString(SORT_METHOD_KEY);
+            bundle.putString(SORT_METHOD_KEY, sort);
+            loaderManager.restartLoader(LOADER_ID, bundle, this);
+        }
     }
 
     /**
@@ -102,47 +111,47 @@ public class MovieGridActivity extends AppCompatActivity {
         mErrorTv.setVisibility(View.VISIBLE);
     }
 
-    private class MovieTask extends AsyncTask<String, Void, List<Movie>> {
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-
-            // Show loading indicator
-            mLoadingPB.setVisibility(View.VISIBLE);
-        }
-
-        @Override
-        protected List<Movie> doInBackground(String... strings) {
-            // Default sorting is by top rated movies
-            String sort = "top_rated";
-
-            // If an alternative sorting method was passed, us that instead
-            if (strings.length != 0) sort = strings[0];
-
-            URL url = NetworkUtils.buildUrl(sort);
-            try {
-                String moviesString = NetworkUtils.getResponseFromHttpUrl(url);
-                Log.v(LOG_TAG, moviesString);
-                return JsonUtils.getMoviesFromJson(moviesString);
-            } catch (Exception e) {
-                e.printStackTrace();
-                return null;
+    @Override
+    public Loader<List<Movie>> onCreateLoader(int id, final Bundle args) {
+        return new AsyncTaskLoader<List<Movie>>(this) {
+            @Override
+            protected void onStartLoading() {
+                mMovieGridRV.setVisibility(View.INVISIBLE);
+                mLoadingPB.setVisibility(View.VISIBLE);
+                forceLoad();
             }
-        }
 
-        @Override
-        protected void onPostExecute(List<Movie> movies) {
-            // Hide loading indicator
-            mLoadingPB.setVisibility(View.INVISIBLE);
+            @Override
+            public List<Movie> loadInBackground() {
+                // Read the sorting method passed in
+                String sort = null;
+                if (args != null) sort = args.getString(SORT_METHOD_KEY);
+                if (sort == null) sort = "top_rated";
 
-            if (movies == null) {
-                showError();
-            } else {
-                mAdapter.setMovieData(movies);
-                showMovies();
+                URL url = NetworkUtils.buildUrl(sort);
+                try {
+                    String moviesString = NetworkUtils.getResponseFromHttpUrl(url);
+                    return JsonUtils.getMoviesFromJson(moviesString);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return null;
+                }
             }
+        };
+    }
+
+    @Override
+    public void onLoadFinished(Loader<List<Movie>> loader, List<Movie> data) {
+        if (data != null && !data.isEmpty()) {
+            mAdapter.setMovieData(data);
+            showMovies();
+        } else {
+            showError();
         }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<List<Movie>> loader) {
     }
 
     @Override
@@ -169,7 +178,7 @@ public class MovieGridActivity extends AppCompatActivity {
                 return super.onOptionsItemSelected(item);
         }
         mAdapter.setMovieData(null);
-        loadMovies(sort);
+        loadMovies(sort, null);
         return true;
     }
 }
