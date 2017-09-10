@@ -1,0 +1,36 @@
+<resources>
+    <string name="app_name">Moveez</string>
+
+    <!-- Error strings -->
+    <!-- # Generic error -->
+    <string name="error_generic">An error occurred.  Try again later.</string>
+    <!-- # Network error -->
+    <string name="error_netowrk">The network is offline.  Connect and try again.</string>
+
+    <!-- Movie background image description for accessibility -->
+    <string name="poster_description">This is a poster for the given movie</string>
+
+    <!-- NetworkUtils strings for definining movie cover photo size and base path -->
+    <string name="base_url">http://image.tmdb.org/t/p/</string>
+    <string name="image_size_url">w342</string>
+
+    <!-- Strings for sorting movies -->
+    <string name="sort_top_rated">Top Rated</string>
+    <string name="sort_popular">Most Popular</string>
+    <string name="sort_now_playing">Now Playing</string>
+
+    <!-- MovieDetailsActivity -->
+    <string name="btn_mark_favorite">Mark as favorite</string>
+    <string name="tv_trailers">Trailers:</string>
+
+    <!-- Placeholder strings for MovieDetailsActivity -->
+    <string name="placeholder_title">Chappie</string>
+    <string name="placeholder_releasedate">2015</string>
+    <string name="placeholder_runtime">120min</string>
+    <string name="placeholder_rating">8.1/10</string>
+    <string name="placeholder_description">Every child comes into the world full
+        of promise, and none more so than Chappie: he is gifted, special, a prodigy.
+        Chappie he is a robot.
+    </string>
+
+</resources>
