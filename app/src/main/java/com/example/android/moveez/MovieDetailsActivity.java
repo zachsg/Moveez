@@ -12,12 +12,12 @@ import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import java.net.URL;
+import java.util.Locale;
+
 import com.example.android.moveez.data.Movie;
 import com.example.android.moveez.utilities.JsonUtils;
 import com.example.android.moveez.utilities.NetworkUtils;
-
-import java.net.URL;
-import java.util.Locale;
 
 public class MovieDetailsActivity
         extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Movie> {
