@@ -64,8 +64,8 @@ public class MovieGridActivity extends AppCompatActivity
 
     private void loadMovies(String sort, Bundle savedInstanceState) {
         LoaderManager loaderManager = getSupportLoaderManager();
-        loaderManager.getLoader(LOADER_ID);
-        if (loaderManager == null) {
+        Loader<List<Movie>> loader = loaderManager.getLoader(LOADER_ID);
+        if (loader == null) {
             loaderManager.initLoader(LOADER_ID, null, this);
         } else {
             Bundle bundle = new Bundle();

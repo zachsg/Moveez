@@ -61,8 +61,8 @@ public class MovieDetailsActivity
             try {
                 mMovieID = movie.getId();
                 LoaderManager loaderManager = getSupportLoaderManager();
-                loaderManager.getLoader(LOADER_ID);
-                if (loaderManager == null) {
+                Loader<Movie> loader = loaderManager.getLoader(LOADER_ID);
+                if (loader == null) {
                     loaderManager.initLoader(LOADER_ID, null, this);
                 } else {
                     loaderManager.restartLoader(LOADER_ID, null, this);
