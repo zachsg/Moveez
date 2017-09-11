@@ -3,7 +3,6 @@ package com.example.android.moveez.utilities;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.util.Log;
 import android.widget.ImageView;
 
 import com.example.android.moveez.R;
